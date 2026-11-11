@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FoodSave | {{ page_title }}</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f7f4;
+            margin: 0;
+            padding: 30px;
+            color: #26352b;
+        }
+
+        .form-container {
+            max-width: 650px;
+            margin: 30px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        h1 {
+            margin-top: 0;
+        }
+
+        .field {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 7px;
+            font-weight: bold;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 11px;
+            border: 1px solid #dce5dd;
+            border-radius: 7px;
+            box-sizing: border-box;
+        }
+
+        .helptext {
+            color: #718075;
+            font-size: 12px;
+        }
+
+        .errorlist {
+            color: #b32626;
+            font-size: 13px;
+            padding-left: 18px;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 25px;
+        }
+
+        .btn {
+            padding: 11px 18px;
+            border-radius: 7px;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background: #23834b;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #e5f1e8;
+            color: #24743b;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="form-container">
+
+    <h1>{{ page_title }}</h1>
+    <p>Enter the food item's information below.</p>
+
+    <form method="POST">
+        {% csrf_token %}
+
+        {% for field in form %}
+            <div class="field">
+                <label for="{{ field.id_for_label }}">
+                    {{ field.label }}
+                </label>
+
+                {{ field }}
+
+                {% if field.help_text %}
+                    <div class="helptext">{{ field.help_text }}</div>
+                {% endif %}
+
+                {{ field.errors }}
+            </div>
+        {% endfor %}
+
+        {{ form.non_field_errors }}
+
+        <div class="actions">
+            <button type="submit" class="btn btn-primary">
+                Save Food Item
+            </button>
+
+            <a href="{% url 'inventory' %}" class="btn btn-secondary">
+                Cancel
+            </a>
+        </div>
+    </form>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>FoodSave | Activities</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f7f4;
+            padding: 30px;
+            color: #26352b;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 25px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 11px 16px;
+            border-radius: 7px;
+            font-weight: bold;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .primary {
+            background: #23834b;
+            color: white;
+        }
+
+        .secondary {
+            background: #e5f1e8;
+            color: #24743b;
+        }
+
+        .filters {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            background: white;
+            padding: 18px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        input, select {
+            padding: 11px;
+            border: 1px solid #dce5dd;
+            border-radius: 7px;
+            font-size: 14px;
+        }
+
+        .filters input {
+            flex: 1;
+            min-width: 180px;
+        }
+
+        .table-container {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+
+        th, td {
+            padding: 14px;
+            text-align: left;
+            border-bottom: 1px solid #e8eee9;
+        }
+
+        th {
+            background: #edf5ef;
+            color: #315b3e;
+        }
+
+        .badge {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .consumed {
+            background: #dff5e5;
+            color: #24743b;
+        }
+
+        .wasted {
+            background: #ffe0e0;
+            color: #b32626;
+        }
+
+        .message {
+            background: #dff5e5;
+            color: #24743b;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 30px;
+            color: #777;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="header">
+
+        <div>
+            <h1>Food Activities</h1>
+            <p>Track food consumption and waste.</p>
+            <a href="/" class="secondary btn">← Dashboard</a>
+        </div>
+
+        <a href="{% url 'add_activity' %}" class="btn primary">
+            + Record Activity
+        </a>
+
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="message">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <form method="GET" class="filters">
+
+        <input
+            type="text"
+            name="search"
+            placeholder="Search food..."
+            value="{{ search_query }}"
+        >
+
+        <select name="type">
+
+            <option value="">All Activities</option>
+
+            <option value="Consumed"
+                {% if selected_type == 'Consumed' %}selected{% endif %}>
+                Consumed
+            </option>
+
+            <option value="Wasted"
+                {% if selected_type == 'Wasted' %}selected{% endif %}>
+                Wasted
+            </option>
+
+        </select>
+
+        <button type="submit" class="btn primary">
+            Apply Filters
+        </button>
+
+        <a href="{% url 'activities' %}" class="btn secondary">
+            Clear
+        </a>
+
+    </form>
+
+    <div class="table-container">
+
+        <table>
+
+            <thead>
+                <tr>
+                    <th>Food Name</th>
+                    <th>Activity</th>
+                    <th>Quantity</th>
+                    <th>Reason</th>
+                    <th>Date</th>
+                    <th>Estimated Value (€)</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for activity in activities %}
+
+                    <tr>
+
+                        <td>{{ activity.food_name }}</td>
+
+                        <td>
+                            {% if activity.activity_type == 'Consumed' %}
+                                <span class="badge consumed">Consumed</span>
+                            {% else %}
+                                <span class="badge wasted">Wasted</span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {{ activity.quantity }} {{ activity.unit }}
+                        </td>
+
+                        <td>
+                            {{ activity.reason|default:"-" }}
+                        </td>
+
+                        <td>
+                            {{ activity.activity_date|date:"d M Y" }}
+                        </td>
+
+                        <td>
+                            €{{ activity.quantity|floatformat:2 }}
+                        </td>
+
+                    </tr>
+
+                {% empty %}
+
+                    <tr>
+                        <td colspan="6" class="empty">
+                            No food activities recorded yet.
+                        </td>
+                    </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+</body>
+</html>

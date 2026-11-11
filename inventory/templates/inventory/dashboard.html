@@ -1,0 +1,322 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>FoodSave | Dashboard</title>
+
+    <link rel="stylesheet"
+          href="{% static 'inventory/css/dashboard.css' %}">
+</head>
+
+<body>
+
+<div class="app-container">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+
+        <div class="brand">
+            <span class="brand-icon">🌿</span>
+            <h2>FoodSave</h2>
+        </div>
+
+        <p class="menu-label">MENU</p>
+
+        <nav>
+            <a href="/" class="nav-link active">▦ Dashboard</a>
+            <a href="/inventory/" class="nav-link">▤ Inventory</a>
+            <a href="/activities/" class="nav-link">◷ Activities</a>
+            <!-- <a href="/analytics/" class="nav-link">▥ Analytics</a> -->
+        </nav>
+
+        <div class="sidebar-bottom">
+            <p>Reduce waste.</p>
+            <p>Save food. Save money.</p>
+        </div>
+
+    </aside>
+
+
+    <!-- Main Content -->
+    <main class="main-content">
+
+        <!-- Top Bar -->
+        <header class="topbar">
+
+            <div>
+                <h1>Dashboard</h1>
+                <p>Your food inventory at a glance.</p>
+            </div>
+
+            <div class="user-profile">
+                <span class="avatar">B</span>
+                <span>My Account</span>
+            </div>
+
+        </header>
+
+
+        <!-- Welcome -->
+        <section class="welcome-section">
+
+            <div>
+                <h2>Welcome back! 👋</h2>
+                <p>Let's keep track of your food and reduce waste.</p>
+            </div>
+
+            <a href="/admin/" class="admin-button">
+                Admin Panel
+            </a>
+
+        </section>
+
+
+        <!-- Summary Cards -->
+        <section class="stats-grid">
+
+            <div class="stat-card">
+                <div class="stat-icon green">📦</div>
+                <p>Total Food Items</p>
+                <h2>24</h2>
+                <span>Items in your inventory</span>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon orange">⏳</div>
+                <p>Expiring Soon</p>
+                <h2>5</h2>
+                <span>Within the next 3 days</span>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon red">⚠️</div>
+                <p>Expired Items</p>
+                <h2>2</h2>
+                <span>Need your attention</span>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon blue">♻️</div>
+                <p>Food Activities</p>
+                <h2>12</h2>
+                <span>Consumption and waste records</span>
+            </div>
+
+        </section>
+
+
+        <!-- Expiry and Waste Overview -->
+        <section class="dashboard-grid">
+
+            <div class="content-card">
+
+                <div class="card-heading">
+                    <div>
+                        <h3>Expiry Alerts</h3>
+                        <p>Food items that need attention</p>
+                    </div>
+
+                    <a href="/inventory/">View all</a>
+                </div>
+
+                <div class="food-row">
+                    <div class="food-info">
+                        <span class="food-emoji">🥛</span>
+                        <div>
+                            <h4>Milk</h4>
+                            <p>1 litre · Dairy</p>
+                        </div>
+                    </div>
+
+                    <span class="status warning">1 day left</span>
+                </div>
+
+                <div class="food-row">
+                    <div class="food-info">
+                        <span class="food-emoji">🍗</span>
+                        <div>
+                            <h4>Chicken</h4>
+                            <p>500 g · Meat</p>
+                        </div>
+                    </div>
+
+                    <span class="status warning">2 days left</span>
+                </div>
+
+                <div class="food-row">
+                    <div class="food-info">
+                        <span class="food-emoji">🥬</span>
+                        <div>
+                            <h4>Lettuce</h4>
+                            <p>1 piece · Vegetables</p>
+                        </div>
+                    </div>
+
+                    <span class="status danger">Expired</span>
+                </div>
+
+            </div>
+
+
+            <div class="content-card">
+
+                <div class="card-heading">
+                    <div>
+                        <h3>Waste Overview</h3>
+                        <p>Consumption vs waste activity records</p>
+                    </div>
+                </div>
+
+                <div class="waste-number">
+                    <h2 id="wasteRate">0%</h2>
+                    <span>Waste rate by activity count</span>
+                </div>
+
+                <div class="progress-bar">
+                    <div class="progress-fill" id="consumedProgress"></div>
+                </div>
+
+                <div class="waste-details">
+
+                    <div>
+                        <span class="dot green-dot"></span>
+                        <span>Consumed records</span>
+                        <strong id="consumedCount">0</strong>
+                    </div>
+
+                    <div>
+                        <span class="dot red-dot"></span>
+                        <span>Wasted records</span>
+                        <strong id="wastedCount">0</strong>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- Graphical Analytics -->
+        <section class="charts-section">
+
+
+            <!-- Consumption vs Waste -->
+            <div class="chart-card">
+
+                <div class="card-heading">
+
+                    <div>
+                        <h3>Consumption vs Waste</h3>
+                        <p>Food activity breakdown</p>
+                    </div>
+
+                    <select id="periodSelector"
+                            class="period-selector">
+
+                        <option value="7">Last 7 days</option>
+                        <option value="30" selected>Last 30 days</option>
+                        <option value="90">Last 90 days</option>
+                        <option value="all">All time</option>
+
+                    </select>
+
+                </div>
+
+                <div class="chart-container">
+                    <canvas id="consumptionChart"></canvas>
+                </div>
+
+                <p class="chart-note">
+                    Based on the number of recorded activities,
+                    not food weight or volume.
+                </p>
+
+            </div>
+
+
+            <!-- Monthly Money Saved -->
+            <div class="chart-card">
+
+                <div class="card-heading">
+
+                    <div>
+                        <h3>Monthly Money Saved</h3>
+                        <p>Estimated value of food consumed</p>
+                    </div>
+
+                    <span class="currency-label">EUR (€)</span>
+
+                </div>
+
+                <div class="chart-container">
+                    <canvas id="savingsChart"></canvas>
+                </div>
+
+                <p class="chart-note">
+                    Estimated using recorded consumption quantities
+                    and historical product prices.
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- Recent Activity -->
+        <section class="content-card recent-section">
+
+            <div class="card-heading">
+                <div>
+                    <h3>Recent Activities</h3>
+                    <p>Your latest food consumption and waste records</p>
+                </div>
+
+                <a href="/activities/">View all</a>
+            </div>
+
+            <div class="activity-row">
+                <span class="activity-icon">🍎</span>
+
+                <div class="activity-description">
+                    <h4>Apples consumed</h4>
+                    <p>Today</p>
+                </div>
+
+                <span class="activity-type consumed">Consumed</span>
+            </div>
+
+            <div class="activity-row">
+                <span class="activity-icon">🥛</span>
+
+                <div class="activity-description">
+                    <h4>Milk discarded</h4>
+                    <p>Yesterday · Expired</p>
+                </div>
+
+                <span class="activity-type wasted">Wasted</span>
+            </div>
+
+        </section>
+
+
+        <footer>
+            <p>FoodSave © 2026 · Eat better. Waste less. 🌱</p>
+        </footer>
+
+    </main>
+
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script src="{% static 'inventory/js/dashboard.js' %}"></script>
+
+</body>
+</html>

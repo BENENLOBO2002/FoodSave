@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FoodSave | Confirm Delete</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f7f4;
+            padding: 30px;
+            color: #26352b;
+        }
+
+        .confirmation {
+            max-width: 500px;
+            margin: 100px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 11px 18px;
+            border-radius: 7px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .btn-delete {
+            background: #c62828;
+            color: white;
+        }
+
+        .btn-cancel {
+            background: #e5f1e8;
+            color: #24743b;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="confirmation">
+
+    <h2>Delete Food Item?</h2>
+
+    <p>
+        Are you sure you want to delete
+        <strong>{{ food_item.food_name }}</strong>
+        from your inventory?
+    </p>
+
+    <p>This action cannot be undone.</p>
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <button type="submit" class="btn btn-delete">
+            Yes, Delete
+        </button>
+
+        <a href="{% url 'inventory' %}" class="btn btn-cancel">
+            Cancel
+        </a>
+    </form>
+
+</div>
+
+</body>
+</html>
