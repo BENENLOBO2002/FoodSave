@@ -1,3 +1,42 @@
+import logging
+
+logger = logging.getLogger(__name__)
+
+
+def add_food(request):
+    if request.method == 'POST':
+        form = FoodItemForm(request.POST)
+
+        if form.is_valid():
+            try:
+                form.save()
+                messages.success(
+                    request,
+                    'Food item added successfully.'
+                )
+                return redirect('inventory')
+
+            except Exception:
+                logger.exception(
+                    "Failed to save FoodItem in add_food view"
+                )
+                messages.error(
+                    request,
+                    'Unable to save the food item. Please try again.'
+                )
+    else:
+        form = FoodItemForm()
+
+    return render(request, 'inventory/food_form.html', {
+        'form': form,
+        'page_title': 'Add Food Item'
+    })
+
+
+
+
+
+
 from datetime import timedelta
 from django.http import JsonResponse
 from django.db.models import (
