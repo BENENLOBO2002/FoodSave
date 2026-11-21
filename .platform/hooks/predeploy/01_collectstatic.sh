@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-cd /var/app/current
+cd /var/app/staging
 
 VENV_DIR=$(find /var/app/venv -mindepth 1 -maxdepth 1 -type d -name 'staging-*' -print -quit)
 
