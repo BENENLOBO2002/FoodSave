@@ -1,73 +1,39 @@
+
 import logging
-
-logger = logging.getLogger(__name__)
-
-
-def add_food(request):
-    if request.method == 'POST':
-        form = FoodItemForm(request.POST)
-
-        if form.is_valid():
-            try:
-                form.save()
-                messages.success(
-                    request,
-                    'Food item added successfully.'
-                )
-                return redirect('inventory')
-
-            except Exception:
-                logger.exception(
-                    "Failed to save FoodItem in add_food view"
-                )
-                messages.error(
-                    request,
-                    'Unable to save the food item. Please try again.'
-                )
-    else:
-        form = FoodItemForm()
-
-    return render(request, 'inventory/food_form.html', {
-        'form': form,
-        'page_title': 'Add Food Item'
-    })
-
-
-
-
-
-
 from datetime import timedelta
-from django.http import JsonResponse
+
+from django.contrib import messages
+from django.db import transaction
 from django.db.models import (
     Sum,
     Count,
     DecimalField,
     ExpressionWrapper,
     F,
+    Q,
 )
 from django.db.models.functions import TruncMonth
-from django.utils import timezone
-from .models import FoodItem, FoodActivity
+from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib import messages
-from django.db.models import Q
-from .forms import FoodItemForm
-from django.db import transaction
+from django.utils import timezone
+
+from .models import FoodItem, FoodActivity
 from .forms import FoodItemForm, FoodActivityForm
+
+
+logger = logging.getLogger(__name__)
+
 
 def dashboard(request):
     return render(request, 'inventory/dashboard.html')
 
 
 def consumption_analytics(request):
-
     period = request.GET.get('period', '30')
 
     activities = FoodActivity.objects.all()
 
     if period != 'all':
-
         try:
             days = int(period)
 
@@ -97,7 +63,6 @@ def consumption_analytics(request):
     wasted = 0
 
     for item in results:
-
         if item['activity_type'] == 'Consumed':
             consumed = item['total']
 
@@ -112,7 +77,6 @@ def consumption_analytics(request):
 
 
 def monthly_savings_analytics(request):
-
     today = timezone.localdate()
 
     # Show the current month and previous 11 months
@@ -239,9 +203,26 @@ def add_food(request):
         form = FoodItemForm(request.POST)
 
         if form.is_valid():
-            form.save()
-            messages.success(request, 'Food item added successfully.')
-            return redirect('inventory')
+            try:
+                form.save()
+
+                messages.success(
+                    request,
+                    'Food item added successfully.'
+                )
+
+                return redirect('inventory')
+
+            except Exception:
+                logger.exception(
+                    "Failed to save FoodItem in add_food view"
+                )
+
+                messages.error(
+                    request,
+                    'Unable to save the food item. Please try again.'
+                )
+
     else:
         form = FoodItemForm()
 
@@ -259,8 +240,14 @@ def edit_food(request, pk):
 
         if form.is_valid():
             form.save()
-            messages.success(request, 'Food item updated successfully.')
+
+            messages.success(
+                request,
+                'Food item updated successfully.'
+            )
+
             return redirect('inventory')
+
     else:
         form = FoodItemForm(instance=food_item)
 
@@ -290,12 +277,10 @@ def delete_food(request, pk):
 
 
 def add_activity(request):
-
     if request.method == 'POST':
         form = FoodActivityForm(request.POST)
 
         if form.is_valid():
-
             try:
                 with transaction.atomic():
 
@@ -346,7 +331,6 @@ def add_activity(request):
 
 
 def activity_list(request):
-
     activities = FoodActivity.objects.all().order_by(
         '-activity_date',
         '-created_at'
