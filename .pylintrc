@@ -1,0 +1,17 @@
+
+[MASTER]
+load-plugins=pylint_django
+django-settings-module=config.settings
+ignore=migrations
+
+[MESSAGES CONTROL]
+disable=
+    missing-module-docstring,
+    missing-class-docstring,
+    missing-function-docstring
+
+[FORMAT]
+max-line-length=100
+
+[REPORTS]
+score=yes
