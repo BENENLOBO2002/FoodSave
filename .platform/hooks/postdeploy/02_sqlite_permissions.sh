@@ -1,24 +1,27 @@
-
 #!/bin/bash
 set -e
 
 APP_DIR="/var/app/current"
 DB="$APP_DIR/db.sqlite3"
 
-echo "Fixing SQLite permissions..."
+echo "Checking SQLite database permissions..."
 
 if [ ! -f "$DB" ]; then
-    echo "ERROR: SQLite database not found at $DB"
-    exit 1
+    echo "SQLite database not found. Skipping permissions setup."
+    exit 0
 fi
 
-# Allow the webapp process to write to the database
 chown webapp:webapp "$DB"
 chmod 664 "$DB"
 
-# Allow SQLite to create journal/WAL files in the application directory
 chgrp webapp "$APP_DIR"
 chmod 775 "$APP_DIR"
+
+for SUFFIX in -journal -wal -shm; do
+    if [ -f "${DB}${SUFFIX}" ]; then
+        chown webapp:webapp "${DB}${SUFFIX}"
+    fi
+done
 
 echo "SQLite permissions updated successfully."
 ls -l "$DB"
