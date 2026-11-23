@@ -25,7 +25,54 @@ logger = logging.getLogger(__name__)
 
 
 def dashboard(request):
-    return render(request, 'inventory/dashboard.html')
+    today = timezone.localdate()
+    three_days_later = today + timedelta(days=3)
+
+    # Dashboard summary statistics
+    total_food_items = FoodItem.objects.count()
+
+    expiring_soon_count = FoodItem.objects.filter(
+        expiry_date__gte=today,
+        expiry_date__lte=three_days_later,
+        quantity__gt=0
+    ).count()
+
+    expired_items_count = FoodItem.objects.filter(
+        expiry_date__lt=today,
+        quantity__gt=0
+    ).count()
+
+    total_activities = FoodActivity.objects.count()
+
+    # Get the three most urgent expiry alerts
+    expiry_alerts = FoodItem.objects.filter(
+        expiry_date__lte=three_days_later,
+        quantity__gt=0
+    ).order_by('expiry_date')[:3]
+
+    # Calculate days remaining for each item
+    for item in expiry_alerts:
+        item.days_remaining = (item.expiry_date - today).days
+        item.is_expired = item.days_remaining < 0
+
+    # Get the five most recent activities
+    recent_activities = FoodActivity.objects.select_related(
+        'food_item'
+    ).order_by(
+        '-activity_date',
+        '-created_at'
+    )[:5]
+
+    context = {
+        'total_food_items': total_food_items,
+        'expiring_soon_count': expiring_soon_count,
+        'expired_items_count': expired_items_count,
+        'total_activities': total_activities,
+        'expiry_alerts': expiry_alerts,
+        'recent_activities': recent_activities,
+    }
+
+    return render(request, 'inventory/dashboard.html', context)
 
 
 def consumption_analytics(request):

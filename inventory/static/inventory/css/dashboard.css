@@ -568,3 +568,18 @@ footer {
     }
 
 }
+
+.empty-state {
+    padding: 25px 10px;
+    text-align: center;
+    color: #718096;
+}
+
+.empty-state p {
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+.empty-state span {
+    font-size: 13px;
+}

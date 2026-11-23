@@ -1,3 +1,4 @@
+
 {% load static %}
 
 <!DOCTYPE html>
@@ -31,7 +32,6 @@
             <a href="/" class="nav-link active">▦ Dashboard</a>
             <a href="/inventory/" class="nav-link">▤ Inventory</a>
             <a href="/activities/" class="nav-link">◷ Activities</a>
-            <!-- <a href="/analytics/" class="nav-link">▥ Analytics</a> -->
         </nav>
 
         <div class="sidebar-bottom">
@@ -82,28 +82,28 @@
             <div class="stat-card">
                 <div class="stat-icon green">📦</div>
                 <p>Total Food Items</p>
-                <h2>24</h2>
+                <h2>{{ total_food_items }}</h2>
                 <span>Items in your inventory</span>
             </div>
 
             <div class="stat-card">
                 <div class="stat-icon orange">⏳</div>
                 <p>Expiring Soon</p>
-                <h2>5</h2>
+                <h2>{{ expiring_soon_count }}</h2>
                 <span>Within the next 3 days</span>
             </div>
 
             <div class="stat-card">
                 <div class="stat-icon red">⚠️</div>
                 <p>Expired Items</p>
-                <h2>2</h2>
+                <h2>{{ expired_items_count }}</h2>
                 <span>Need your attention</span>
             </div>
 
             <div class="stat-card">
                 <div class="stat-icon blue">♻️</div>
                 <p>Food Activities</p>
-                <h2>12</h2>
+                <h2>{{ total_activities }}</h2>
                 <span>Consumption and waste records</span>
             </div>
 
@@ -113,6 +113,7 @@
         <!-- Expiry and Waste Overview -->
         <section class="dashboard-grid">
 
+            <!-- Expiry Alerts -->
             <div class="content-card">
 
                 <div class="card-heading">
@@ -124,45 +125,75 @@
                     <a href="/inventory/">View all</a>
                 </div>
 
-                <div class="food-row">
-                    <div class="food-info">
-                        <span class="food-emoji">🥛</span>
-                        <div>
-                            <h4>Milk</h4>
-                            <p>1 litre · Dairy</p>
+                {% for item in expiry_alerts %}
+
+                    <div class="food-row">
+
+                        <div class="food-info">
+
+                            <span class="food-emoji">
+                                {% if item.category == 'Fruits' %}
+                                    🍎
+                                {% elif item.category == 'Vegetables' %}
+                                    🥬
+                                {% elif item.category == 'Dairy' %}
+                                    🥛
+                                {% elif item.category == 'Meat' %}
+                                    🥩
+                                {% elif item.category == 'Seafood' %}
+                                    🐟
+                                {% elif item.category == 'Grains' %}
+                                    🌾
+                                {% elif item.category == 'Beverages' %}
+                                    🥤
+                                {% else %}
+                                    📦
+                                {% endif %}
+                            </span>
+
+                            <div>
+                                <h4>{{ item.food_name }}</h4>
+                                <p>
+                                    {{ item.quantity|floatformat:2 }}
+                                    {{ item.unit }} · {{ item.category }}
+                                </p>
+                            </div>
+
                         </div>
+
+                        {% if item.is_expired %}
+                            <span class="status danger">
+                                Expired
+                            </span>
+                        {% elif item.days_remaining == 0 %}
+                            <span class="status danger">
+                                Expires today
+                            </span>
+                        {% elif item.days_remaining == 1 %}
+                            <span class="status warning">
+                                1 day left
+                            </span>
+                        {% else %}
+                            <span class="status warning">
+                                {{ item.days_remaining }} days left
+                            </span>
+                        {% endif %}
+
                     </div>
 
-                    <span class="status warning">1 day left</span>
-                </div>
+                {% empty %}
 
-                <div class="food-row">
-                    <div class="food-info">
-                        <span class="food-emoji">🍗</span>
-                        <div>
-                            <h4>Chicken</h4>
-                            <p>500 g · Meat</p>
-                        </div>
+                    <div class="empty-state">
+                        <p>🎉 No expiry alerts at the moment.</p>
+                        <span>Your available food inventory is looking good.</span>
                     </div>
 
-                    <span class="status warning">2 days left</span>
-                </div>
-
-                <div class="food-row">
-                    <div class="food-info">
-                        <span class="food-emoji">🥬</span>
-                        <div>
-                            <h4>Lettuce</h4>
-                            <p>1 piece · Vegetables</p>
-                        </div>
-                    </div>
-
-                    <span class="status danger">Expired</span>
-                </div>
+                {% endfor %}
 
             </div>
 
 
+            <!-- Waste Overview -->
             <div class="content-card">
 
                 <div class="card-heading">
@@ -178,7 +209,8 @@
                 </div>
 
                 <div class="progress-bar">
-                    <div class="progress-fill" id="consumedProgress"></div>
+                    <div class="progress-fill"
+                         id="consumedProgress"></div>
                 </div>
 
                 <div class="waste-details">
@@ -204,7 +236,6 @@
 
         <!-- Graphical Analytics -->
         <section class="charts-section">
-
 
             <!-- Consumption vs Waste -->
             <div class="chart-card">
@@ -268,7 +299,7 @@
         </section>
 
 
-        <!-- Recent Activity -->
+        <!-- Recent Activities -->
         <section class="content-card recent-section">
 
             <div class="card-heading">
@@ -280,31 +311,66 @@
                 <a href="/activities/">View all</a>
             </div>
 
-            <div class="activity-row">
-                <span class="activity-icon">🍎</span>
+            {% for activity in recent_activities %}
 
-                <div class="activity-description">
-                    <h4>Apples consumed</h4>
-                    <p>Today</p>
+                <div class="activity-row">
+
+                    <span class="activity-icon">
+                        {% if activity.activity_type == 'Consumed' %}
+                            🍽️
+                        {% else %}
+                            🗑️
+                        {% endif %}
+                    </span>
+
+                    <div class="activity-description">
+
+                        <h4>
+                            {{ activity.food_name }}
+                            {% if activity.activity_type == 'Consumed' %}
+                                consumed
+                            {% else %}
+                                wasted
+                            {% endif %}
+                        </h4>
+
+                        <p>
+                            {{ activity.quantity|floatformat:2 }}
+                            {{ activity.unit }}
+                            · {{ activity.activity_date|date:"j M Y" }}
+
+                            {% if activity.reason %}
+                                · {{ activity.reason }}
+                            {% endif %}
+                        </p>
+
+                    </div>
+
+                    {% if activity.activity_type == 'Consumed' %}
+                        <span class="activity-type consumed">
+                            Consumed
+                        </span>
+                    {% else %}
+                        <span class="activity-type wasted">
+                            Wasted
+                        </span>
+                    {% endif %}
+
                 </div>
 
-                <span class="activity-type consumed">Consumed</span>
-            </div>
+            {% empty %}
 
-            <div class="activity-row">
-                <span class="activity-icon">🥛</span>
-
-                <div class="activity-description">
-                    <h4>Milk discarded</h4>
-                    <p>Yesterday · Expired</p>
+                <div class="empty-state">
+                    <p>No activities recorded yet.</p>
+                    <span>Record your first consumption or waste activity to see it here.</span>
                 </div>
 
-                <span class="activity-type wasted">Wasted</span>
-            </div>
+            {% endfor %}
 
         </section>
 
 
+        <!-- Footer -->
         <footer>
             <p>FoodSave © 2026 · Eat better. Waste less. 🌱</p>
         </footer>
@@ -314,8 +380,10 @@
 </div>
 
 
+<!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
+<!-- Dashboard Analytics -->
 <script src="{% static 'inventory/js/dashboard.js' %}"></script>
 
 </body>
