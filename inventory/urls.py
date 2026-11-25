@@ -23,3 +23,4 @@ urlpatterns = [
     path('activities/', views.activity_list, name='activities'),
     path('activities/add/', views.add_activity, name='add_activity'),
 ]
+

@@ -114,3 +114,4 @@ class FoodActivityForm(forms.ModelForm):
             )
 
         return cleaned_data
+    

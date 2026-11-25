@@ -35,3 +35,5 @@ class FoodActivityAdmin(admin.ModelAdmin):
     list_filter = ('activity_type', 'reason', 'activity_date')
     search_fields = ('food_name',)
     date_hierarchy = 'activity_date'
+
+    
