@@ -10,7 +10,6 @@ from django.db.models import (
     DecimalField,
     ExpressionWrapper,
     F,
-    Q,
 )
 from django.db.models.functions import TruncMonth
 from django.http import JsonResponse
